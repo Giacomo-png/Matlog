@@ -13,6 +13,7 @@ export type Move = {
   videoUrl?: string;
 };
 
+
 export const MOVES: Move[] = [
   // SUBMISSIONS (5+)
   {
@@ -64,6 +65,7 @@ export const MOVES: Move[] = [
     videoUrl: "https://youtu.be/bEo7bj0lxUY?si=QDyNr4ItD7siElk8",
   },
 
+
   // PASSES (5+)
   {
     slug: "knee-cut-pass",
@@ -105,6 +107,7 @@ export const MOVES: Move[] = [
       "Bein diagonal über die eigene Hüfte ziehen, Knie einklemmen und zur Seite in Kontrolle übergehen.",
     videoUrl: "https://youtu.be/9WamuarRD20?si=c9tfFheBM5xI2qcw",
   },
+
 
   // SWEEPS (5+)
   {
@@ -148,6 +151,7 @@ export const MOVES: Move[] = [
     videoUrl: "https://youtu.be/NfgvFpvuzkQ?si=8qem-VSOhXyZiLIk",
   },
 
+
   // GUARD (5+)
   {
     slug: "closed-guard",
@@ -189,6 +193,7 @@ export const MOVES: Move[] = [
       "Ärmelgriffe mit Füßen in den Bizeps, starke Kontrolle über Distanz und Arme des Gegners.",
     videoUrl: "https://youtu.be/zoabs7H2ZN8?si=pYXMkmrjk6E6FsWz",
   },
+
 
   // TAKEDOWNS (5+)
   {
@@ -232,6 +237,7 @@ export const MOVES: Move[] = [
     videoUrl: "https://youtu.be/e_c7G5T_ZR8?si=jQpG6X2tXOT9rrnv",
   },
 
+
   // ESCAPES (5+)
   {
     slug: "shrimp-escape",
@@ -273,6 +279,7 @@ export const MOVES: Move[] = [
       "Kinn schützen, auf die „schwache Seite“ rollen und Hüfte aus der Rückenposition drehen.",
     videoUrl: "https://youtu.be/uT-7lJxykCg?si=MdPZ46XJQ9wwz8y1",
   },
+
 
   // TRANSITIONS (neu, 5+)
   {

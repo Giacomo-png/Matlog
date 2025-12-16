@@ -39,7 +39,6 @@ function saveTrainings(trainings: Training[]) {
 export default function NewTrainingPage() {
   const router = useRouter();
 
-  // heute im Format YYYY-MM-DD
   const today = useMemo(
     () => new Date().toISOString().slice(0, 10),
     []
@@ -54,6 +53,20 @@ export default function NewTrainingPage() {
   const [workedBad, setWorkedBad] = useState("");
   const [moves, setMoves] = useState<TrainingMoveResult[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const [moveQuery, setMoveQuery] = useState("");
+
+  const filteredMoves = useMemo(() => {
+    const q = moveQuery.trim().toLowerCase();
+    if (!q) return sortedMoves;
+    return sortedMoves.filter((m) => {
+      return (
+        m.name.toLowerCase().includes(q) ||
+        m.category.toLowerCase().includes(q) ||
+        m.slug.toLowerCase().includes(q)
+      );
+    });
+  }, [sortedMoves, moveQuery]);
 
   function setMoveResult(slug: string, success: boolean | null) {
     setMoves((prev) => {
@@ -96,119 +109,204 @@ export default function NewTrainingPage() {
     router.refresh();
   }
 
+  const selectedCount = moves.length;
+  const successCount = moves.filter((m) => m.success).length;
+  const failCount = selectedCount - successCount;
+
   return (
-    <main className="p-6 space-y-4 max-w-xl">
-      <h1 className="text-2xl font-bold">Neues Training</h1>
-
-      <label className="block">
-        <span className="block mb-1 font-medium">Datum</span>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          max={today}
-          className="border rounded px-3 py-2 w-full"
+    <main className="relative min-h-screen overflow-hidden">
+      {/* Hintergrundbild wie Stats-Page */}
+      <div className="absolute inset-0 -z-10">
+        <img
+          src="/bjjback.png"
+          alt="BJJ Hintergrund"
+          className="w-full h-full object-cover"
         />
-      </label>
-
-      <div className="space-y-2">
-        <div className="font-medium">Moves (optional)</div>
-        <div className="border rounded p-3 max-h-56 overflow-auto space-y-2">
-          {sortedMoves.map((m) => {
-            const current = moves.find((x) => x.slug === m.slug);
-            const value =
-              current?.success === true
-                ? "ok"
-                : current?.success === false
-                ? "bad"
-                : "none";
-
-            return (
-              <div key={m.slug} className="flex flex-col gap-1 border-b pb-2">
-                <div className="flex justify-between items-center">
-                  <span>
-                    {m.name}{" "}
-                    <span className="text-sm opacity-70">({m.category})</span>
-                  </span>
-                </div>
-                <div className="flex gap-2 text-sm">
-                  <button
-                    type="button"
-                    onClick={() => setMoveResult(m.slug, true)}
-                    className={
-                      "px-2 py-1 rounded border " +
-                      (value === "ok" ? "bg-green-200" : "")
-                    }
-                  >
-                    geklappt
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMoveResult(m.slug, false)}
-                    className={
-                      "px-2 py-1 rounded border " +
-                      (value === "bad" ? "bg-red-200" : "")
-                    }
-                  >
-                    nicht geklappt
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMoveResult(m.slug, null)}
-                    className="px-2 py-1 rounded border text-xs"
-                  >
-                    zurücksetzen
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="text-sm opacity-70">
-          Ausgewählt: {moves.length}
-        </div>
       </div>
 
-      <label className="block">
-        <span className="block mb-1 font-medium">Was hat geklappt?</span>
-        <textarea
-          value={workedWell}
-          onChange={(e) => setWorkedWell(e.target.value)}
-          className="border rounded px-3 py-2 w-full min-h-[110px]"
-          placeholder="z.B. Guard Retention war stabil, Triangle Setup funktioniert…"
-        />
-      </label>
+      {/* Dunkler Overlay */}
+      <div className="absolute inset-0 bg-slate-950/70 -z-0" />
 
-      <label className="block">
-        <span className="block mb-1 font-medium">Was hat nicht geklappt?</span>
-        <textarea
-          value={workedBad}
-          onChange={(e) => setWorkedBad(e.target.value)}
-          className="border rounded px-3 py-2 w-full min-h-[110px]"
-          placeholder="z.B. beim Pass zu viel Raum gelassen, Armbar Finish fehlt…"
-        />
-      </label>
+      {/* Inhalt */}
+      <div className="relative z-10 min-h-screen px-4 py-6 text-slate-50 flex justify-center">
+        <div className="w-full max-w-2xl space-y-6">
+          {/* Header */}
+          <header className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">Neues Training</h1>
+              <p className="text-xs text-slate-300">
+                Log deine Session direkt nach dem Rollen.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              className="text-sm text-blue-400 underline"
+            >
+              ← Zurück
+            </button>
+          </header>
 
-      {error ? (
-        <p className="text-sm" style={{ color: "red" }}>
-          {error}
-        </p>
-      ) : null}
+          {/* Card */}
+          <section className="border border-slate-800 bg-slate-900/70 rounded-xl p-4 sm:p-5 space-y-5 shadow-lg">
+            {/* Datum */}
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold tracking-[0.18em] uppercase text-slate-400">
+                Datum
+              </label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                max={today}
+                className="w-full rounded-lg bg-slate-950/60 border border-slate-700 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/60 focus:border-purple-400"
+              />
+            </div>
 
-      <div className="flex gap-3">
-        <button
-          onClick={onSave}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Speichern
-        </button>
+            {/* Moves */}
+            <div className="space-y-3">
+              <div className="flex items-baseline justify-between gap-2">
+                <h2 className="text-xs font-semibold tracking-[0.18em] uppercase text-slate-400">
+                  Moves (optional)
+                </h2>
+                <p className="text-[11px] text-slate-400">
+                  Ausgewählt: {selectedCount} · geklappt: {successCount} · nicht geklappt: {failCount}
+                </p>
+              </div>
 
-        <button
-          onClick={() => router.push("/")}
-          className="border px-4 py-2 rounded"
-        >
-          Abbrechen
-        </button>
+              {/* Suchfeld für Moves */}
+              <input
+                type="text"
+                value={moveQuery}
+                onChange={(e) => setMoveQuery(e.target.value)}
+                placeholder="Move suchen… (Name, Kategorie, Slug)"
+                className="w-full rounded-lg bg-slate-950/60 border border-slate-700 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/60 focus:border-purple-400"
+              />
+
+              <div className="border border-slate-800 rounded-lg bg-slate-950/40 max-h-56 overflow-auto space-y-2 px-3 py-3">
+                {filteredMoves.length === 0 ? (
+                  <p className="text-sm text-slate-400">
+                    Keine Moves gefunden. Suchbegriff anpassen.
+                  </p>
+                ) : (
+                  filteredMoves.map((m) => {
+                    const current = moves.find((x) => x.slug === m.slug);
+                    const value =
+                      current?.success === true
+                        ? "ok"
+                        : current?.success === false
+                          ? "bad"
+                          : "none";
+
+                    return (
+                      <div
+                        key={m.slug}
+                        className="flex flex-col gap-1 border border-slate-800 rounded-lg bg-slate-900/60 px-3 py-2.5 hover:border-purple-500/80 transition-colors"
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium">
+                            {m.name}{" "}
+                            <span className="text-[11px] uppercase tracking-wide text-slate-400">
+                              ({m.category})
+                            </span>
+                          </span>
+                        </div>
+                        <div className="flex gap-2 text-xs">
+                          <button
+                            type="button"
+                            onClick={() => setMoveResult(m.slug, true)}
+                            className={
+                              "px-2.5 py-1 rounded-full border transition-colors " +
+                              (value === "ok"
+                                ? "bg-emerald-500/90 border-emerald-400 text-slate-950"
+                                : "border-emerald-500/60 text-emerald-300 hover:bg-emerald-500/15")
+                            }
+                          >
+                            geklappt
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setMoveResult(m.slug, false)}
+                            className={
+                              "px-2.5 py-1 rounded-full border transition-colors " +
+                              (value === "bad"
+                                ? "bg-rose-500/90 border-rose-400 text-slate-950"
+                                : "border-rose-500/60 text-rose-300 hover:bg-rose-500/15")
+                            }
+                          >
+                            nicht geklappt
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setMoveResult(m.slug, null)}
+                            className="px-2.5 py-1 rounded-full border border-slate-600 text-[11px] text-slate-300 hover:bg-slate-800"
+                          >
+                            zurücksetzen
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            {/* Notizen */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="space-y-2">
+                <span className="block text-xs font-semibold tracking-[0.18em] uppercase text-emerald-400">
+                  Was hat geklappt?
+                </span>
+                <textarea
+                  value={workedWell}
+                  onChange={(e) => setWorkedWell(e.target.value)}
+                  className="w-full rounded-lg bg-slate-950/60 border border-slate-700 px-3 py-2.5 text-sm text-slate-100 min-h-[110px] placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/60 focus:border-emerald-400"
+                  placeholder="z.B. Guard Retention war stabil, Triangle Setup funktioniert…"
+                />
+              </label>
+
+              <label className="space-y-2">
+                <span className="block text-xs font-semibold tracking-[0.18em] uppercase text-rose-400">
+                  Was hat nicht geklappt?
+                </span>
+                <textarea
+                  value={workedBad}
+                  onChange={(e) => setWorkedBad(e.target.value)}
+                  className="w-full rounded-lg bg-slate-950/60 border border-slate-700 px-3 py-2.5 text-sm text-slate-100 min-h-[110px] placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500/60 focus:border-rose-400"
+                  placeholder="z.B. beim Pass zu viel Raum gelassen, Armbar Finish fehlt…"
+                />
+              </label>
+            </div>
+
+            {error ? (
+              <p className="text-sm text-rose-400">
+                {error}
+              </p>
+            ) : null}
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-800">
+              <div className="text-[11px] text-slate-500">
+                Session vom <span className="font-medium text-slate-200">{date}</span> ·{" "}
+                {selectedCount} Moves ausgewählt
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => router.push("/")}
+                  className="border border-slate-700 px-4 py-2.5 rounded-lg text-sm text-slate-200 hover:bg-slate-800"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  onClick={onSave}
+                  className="bg-purple-500/90 hover:bg-purple-400 text-slate-950 px-4 py-2.5 rounded-lg text-sm font-semibold shadow-lg shadow-purple-500/40"
+                >
+                  Speichern
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     </main>
   );
