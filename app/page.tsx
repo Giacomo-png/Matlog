@@ -70,6 +70,15 @@ export default function Home() {
                 <span>Auswertung anzeigen</span>
                 <span className="text-xs text-slate-400">Analytics</span>
               </Link>
+
+              {/* Neuer Bereich: Coach / Academy / Community */}
+              <Link
+                href="/coach"
+                className="flex items-center justify-between bg-emerald-700 hover:bg-emerald-600 px-4 py-3 rounded-lg text-sm font-semibold transition"
+              >
+                <span>Coach / Academy / Community</span>
+                <span className="text-xs text-emerald-100">Beta</span>
+              </Link>
             </div>
           </section>
         </div>
